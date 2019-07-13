@@ -5,7 +5,7 @@
 rm(list=ls())
 
 flips <- 1000
-p <- 0.5
+p <- 0.8
 x <- 1:flips
 nHeads <- sample(c(0,1), size=flips, replace=TRUE, prob=c(1-p,p))
 propH <- cumsum(nHeads)/x
