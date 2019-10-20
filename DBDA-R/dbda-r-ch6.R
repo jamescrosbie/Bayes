@@ -9,7 +9,7 @@ BernGrid = function( Theta, pTheta, Data,
     #  Data is a vector of 1's and 0's, where 1 corresponds to a and 0 to b.
     #  credib is the probability mass of the credible interval, default is 0.95.
     #  nToPlot is the number of grid points to plot; defaults to all of them.
-    #  funcPath path to sources
+    #  funcPath path to source files
     # Output:
     #  pThetaGivenData is a vector of posterior probability masses over Theta.
     #  Also creates a three-panel graph of prior, likelihood, and posterior
@@ -26,13 +26,6 @@ BernGrid = function( Theta, pTheta, Data,
     #  > datavec = c( rep(1,3) , rep(0,1) ) # 3 heads, 1 tail
     #  # Call the function.
     #  > posterior = BernGrid( Theta=thetagrid , pTheta=prior , Data=datavec )
-
-
-    Theta <- seq(from=0, to=1, by=0.1)
-    pTheta <- rep(1/length(Theta), length(Theta))
-    nToPlot=length(Theta)
-    funcPath="C:/Users/james/Documents/Projects/Bayes/Bayes-R-Funcs"
-    credib=.95
 
     library(ggplot2)
     library(gridExtra)
@@ -96,7 +89,7 @@ BernGrid = function( Theta, pTheta, Data,
 
     # likelihood
     if ( z > 0.5*N ) {
-        textx = min(pDataGivenTheta)
+        textx = 0.2
         } else {
         textx = 0.8
     }
@@ -121,24 +114,44 @@ BernGrid = function( Theta, pTheta, Data,
     } else {
         textx = 0.8
     }
+    HDImidpoint = (Theta[ HDIinfo$indices[1] ] + Theta[tail(HDIinfo$indices, n=1)])/2
+
+
     textToAdd <- bquote( "E(" * theta * "|D)=" * .(signif(meanThetaGivenData,3)) )
     textToAdd2 <- bquote("p(D)=" * .(signif(pData,3)))
     textToAdd3 <- bquote( .(100*signif(HDIinfo$mass,3)) * "% HDI" )
+    textToAdd4 <- bquote("[" * .(signif(Theta[ HDIinfo$indices[1] ], 3)) * " - " *
+                            .(signif(Theta[ tail(HDIinfo$indices, n=1) ], 3)) * "]")
 
     posterior <- ggplot(theta_df, aes(x=Theta, pThetaGivenData)) +
         geom_line()+
         geom_point(size=2)+
 
-        annotate("segment", x=Theta[HDIinfo$indices][1],
-                 xend=Theta[HDIinfo$indices][2],
-                 y=HDIinfo$height, yend=HDIinfo$height, colour="blue")+
+        geom_segment(aes(x=Theta[ HDIinfo$indices[1] ],
+                         y=HDIinfo$height,
+                         xend=Theta[tail(HDIinfo$indices, n=1)],
+                         yend=HDIinfo$height), linetype=2, size=2, color="grey")+
+
+        geom_segment(aes(x=Theta[ HDIinfo$indices[1] ],
+                         y = 0,
+                         xend=Theta[ HDIinfo$indices[1] ] ,
+                         yend=HDIinfo$height), linetype=2, size=2, color="grey")+
+
+        geom_segment(aes(x=Theta[tail(HDIinfo$indices, n=1)],
+                         y = 0,
+                         xend=Theta[tail(HDIinfo$indices, n=1)] ,
+                         yend=HDIinfo$height), linetype=2, size=2, color="grey")+
+
         annotate("text", x=textx, y=0.2*max(pThetaGivenData),
                  label=deparse(textToAdd3), parse=TRUE, size=6)+
 
         annotate("text", x=textx, y=0.5*max(pThetaGivenData),
                  label=deparse(textToAdd), parse=TRUE, size=8)+
         annotate("text", x=textx, y=0.35*max(pThetaGivenData),
-                 label=deparse(textToAdd2), parse=TRUE, size=8)+
+                 label=deparse(textToAdd3), parse=TRUE, size=8)+
+
+       annotate("text", x=HDImidpoint, y=1.3*HDIinfo$height,
+                label=deparse(textToAdd4), parse=TRUE, size=8)+
 
         xlim(0,1)+
         ylim(0, 1.1*max(pThetaGivenData))+
@@ -147,28 +160,6 @@ BernGrid = function( Theta, pTheta, Data,
     posterior
 
     grid.arrange(prior, liklihood, posterior, nrow = 3)
-
-    # Mark the highest density interval. HDI points are not thinned in the plot.
-    points( Theta[ HDIinfo$indices ],
-            rep( HDIinfo$height, length( HDIinfo$indices ) ), pch="-", cex=1.0 )
-
-    # Mark the left and right ends of the waterline.
-    # Find indices at ends of sub-intervals:
-    inLim = HDIinfo$indices[1] # first point
-    for ( idx in 2:(length(HDIinfo$indices)-1) ) {
-        if ( ( HDIinfo$indices[idx] != HDIinfo$indices[idx-1]+1 ) | # jumps on left, OR
-             ( HDIinfo$indices[idx] != HDIinfo$indices[idx+1]-1 ) ) { # jumps on right
-            inLim = c(inLim,HDIinfo$indices[idx]) # include idx
-        }
-    }
-    inLim = c(inLim,HDIinfo$indices[length(HDIinfo$indices)]) # last point
-    # Mark vertical lines at ends of sub-intervals:
-    for ( idx in inLim ) {
-        lines( c(Theta[idx], Theta[idx]), c(-0.5,HDIinfo$height),
-               type="l", lty=2, lwd=1.5 )
-        text( Theta[idx], HDIinfo$height, bquote(.(round(Theta[idx],3))),
-              adj=c(0.5,-0.1) , cex=1.2 )
-    }
 
     return( pThetaGivenData )
 }
