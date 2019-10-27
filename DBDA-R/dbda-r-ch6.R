@@ -76,7 +76,7 @@ BernGrid = function( Theta, pTheta, Data,
 
     prior <- ggplot(theta_df, aes(x=Theta, y=pTheta)) +
         geom_line()+
-        geom_point(size=0.5, color="steelblue")+
+        geom_point(size=1.5, color="steelblue")+
 
         annotate("text", x=textx, y=0.5*max(pTheta),
                  label=deparse(textToAdd), parse=TRUE, size=8)+
@@ -85,7 +85,6 @@ BernGrid = function( Theta, pTheta, Data,
         ylim(0,1.1*max(pTheta))+
         labs(title="Prior", x=bquote(theta), y=bquote("p("*theta*")")) +
         jc_theme
-    prior
 
     # likelihood
     if ( z > 0.5*N ) {
@@ -97,7 +96,7 @@ BernGrid = function( Theta, pTheta, Data,
 
     liklihood <- ggplot(theta_df, aes(x=Theta, pDataGivenTheta)) +
         geom_line()+
-        geom_point(size=0.5, color="steelblue")+
+        geom_point(size=1.5, color="steelblue")+
 
         annotate("text", x=textx, y=0.5*max(pDataGivenTheta),
                  label=deparse(textToAdd), parse=TRUE, size=8)+
@@ -105,7 +104,6 @@ BernGrid = function( Theta, pTheta, Data,
         ylim(0, 1.1*max(pDataGivenTheta))+
         labs(title="Liklihood", x=bquote(theta), y=bquote("p(D|"*theta*")"))+
         jc_theme
-    liklihood
 
     # Posterior
     meanThetaGivenData <- sum( Theta * pThetaGivenData )
@@ -120,12 +118,12 @@ BernGrid = function( Theta, pTheta, Data,
     textToAdd <- bquote( "E(" * theta * "|D)=" * .(signif(meanThetaGivenData,3)) )
     textToAdd2 <- bquote("p(D)=" * .(signif(pData,3)))
     textToAdd4 <- bquote( .(100*signif(HDIinfo$mass,3)) * "% HDI" )
-    textToAdd3 <- bquote("[" * .(signif(Theta[ HDIinfo$indices[1] ], 3)) * " - " *
+    textToAdd3 <- bquote("HDI = [" * .(signif(Theta[ HDIinfo$indices[1] ], 3)) * " - " *
                             .(signif(Theta[ tail(HDIinfo$indices, n=1) ], 3)) * "]")
 
     posterior <- ggplot(theta_df, aes(x=Theta, pThetaGivenData)) +
         geom_line()+
-        geom_point(size=0.5, color="steelblue")+
+        geom_point(size=1.5, color="steelblue")+
 
         geom_ribbon(data=subset(theta_df,
                                 Theta[ HDIinfo$indices[1] ] <= Theta &
@@ -140,12 +138,12 @@ BernGrid = function( Theta, pTheta, Data,
         geom_segment(aes(x=Theta[ HDIinfo$indices[1] ],
                          y = 0,
                          xend=Theta[ HDIinfo$indices[1] ] ,
-                         yend=HDIinfo$height), linetype=2, size=2, color="black")+
+                         yend=HDIinfo$height), linetype=1, size=1.5, color="black")+
 
         geom_segment(aes(x=Theta[tail(HDIinfo$indices, n=1)],
                          y = 0,
                          xend=Theta[tail(HDIinfo$indices, n=1)] ,
-                         yend=HDIinfo$height), linetype=2, size=2, color="black")+
+                         yend=HDIinfo$height), linetype=1, size=1.5, color="black")+
 
         # annotate("text", x=textx, y=0.2*max(pThetaGivenData),
         #          label=deparse(textToAdd3), parse=TRUE, size=6)+
@@ -156,14 +154,13 @@ BernGrid = function( Theta, pTheta, Data,
         annotate("text", x=textx, y=0.35*max(pThetaGivenData),
                  label=deparse(textToAdd3), parse=TRUE, size=8)+
 
-       annotate("text", x=HDImidpoint, y=0.5*max(pThetaGivenData),
+        annotate("text", x=HDImidpoint, y=0.5*max(pThetaGivenData),
                 label=deparse(textToAdd4), parse=TRUE, size=8)+
 
         xlim(0,1)+
         ylim(0, 1.1*max(pThetaGivenData))+
         labs(title="Posterior", x=bquote(theta), y=bquote("p("*theta*"|D)"))+
         jc_theme
-    posterior
 
     grid.arrange(prior, liklihood, posterior, nrow = 3)
 
