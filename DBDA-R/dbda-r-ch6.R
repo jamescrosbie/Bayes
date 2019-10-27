@@ -76,7 +76,7 @@ BernGrid = function( Theta, pTheta, Data,
 
     prior <- ggplot(theta_df, aes(x=Theta, y=pTheta)) +
         geom_line()+
-        geom_point(size=2)+
+        geom_point(size=0.5, color="steelblue")+
 
         annotate("text", x=textx, y=0.5*max(pTheta),
                  label=deparse(textToAdd), parse=TRUE, size=8)+
@@ -97,7 +97,7 @@ BernGrid = function( Theta, pTheta, Data,
 
     liklihood <- ggplot(theta_df, aes(x=Theta, pDataGivenTheta)) +
         geom_line()+
-        geom_point(size=2)+
+        geom_point(size=0.5, color="steelblue")+
 
         annotate("text", x=textx, y=0.5*max(pDataGivenTheta),
                  label=deparse(textToAdd), parse=TRUE, size=8)+
@@ -119,38 +119,44 @@ BernGrid = function( Theta, pTheta, Data,
 
     textToAdd <- bquote( "E(" * theta * "|D)=" * .(signif(meanThetaGivenData,3)) )
     textToAdd2 <- bquote("p(D)=" * .(signif(pData,3)))
-    textToAdd3 <- bquote( .(100*signif(HDIinfo$mass,3)) * "% HDI" )
-    textToAdd4 <- bquote("[" * .(signif(Theta[ HDIinfo$indices[1] ], 3)) * " - " *
+    textToAdd4 <- bquote( .(100*signif(HDIinfo$mass,3)) * "% HDI" )
+    textToAdd3 <- bquote("[" * .(signif(Theta[ HDIinfo$indices[1] ], 3)) * " - " *
                             .(signif(Theta[ tail(HDIinfo$indices, n=1) ], 3)) * "]")
 
     posterior <- ggplot(theta_df, aes(x=Theta, pThetaGivenData)) +
         geom_line()+
-        geom_point(size=2)+
+        geom_point(size=0.5, color="steelblue")+
 
-        geom_segment(aes(x=Theta[ HDIinfo$indices[1] ],
-                         y=HDIinfo$height,
-                         xend=Theta[tail(HDIinfo$indices, n=1)],
-                         yend=HDIinfo$height), linetype=2, size=2, color="grey")+
+        geom_ribbon(data=subset(theta_df,
+                                Theta[ HDIinfo$indices[1] ] <= Theta &
+                                           Theta <= Theta[tail(HDIinfo$indices, n=1)]),
+                    aes(ymin=0, ymax=pThetaGivenData), fill="blue", alpha="0.5")+
+
+        # geom_segment(aes(x=Theta[ HDIinfo$indices[1] ],
+        #                  y=HDIinfo$height,
+        #                  xend=Theta[tail(HDIinfo$indices, n=1)],
+        #                  yend=HDIinfo$height), linetype=2, size=1, color="black")+
 
         geom_segment(aes(x=Theta[ HDIinfo$indices[1] ],
                          y = 0,
                          xend=Theta[ HDIinfo$indices[1] ] ,
-                         yend=HDIinfo$height), linetype=2, size=2, color="grey")+
+                         yend=HDIinfo$height), linetype=2, size=2, color="black")+
 
         geom_segment(aes(x=Theta[tail(HDIinfo$indices, n=1)],
                          y = 0,
                          xend=Theta[tail(HDIinfo$indices, n=1)] ,
-                         yend=HDIinfo$height), linetype=2, size=2, color="grey")+
+                         yend=HDIinfo$height), linetype=2, size=2, color="black")+
 
-        annotate("text", x=textx, y=0.2*max(pThetaGivenData),
-                 label=deparse(textToAdd3), parse=TRUE, size=6)+
+        # annotate("text", x=textx, y=0.2*max(pThetaGivenData),
+        #          label=deparse(textToAdd3), parse=TRUE, size=6)+
 
         annotate("text", x=textx, y=0.5*max(pThetaGivenData),
                  label=deparse(textToAdd), parse=TRUE, size=8)+
+
         annotate("text", x=textx, y=0.35*max(pThetaGivenData),
                  label=deparse(textToAdd3), parse=TRUE, size=8)+
 
-       annotate("text", x=HDImidpoint, y=1.3*HDIinfo$height,
+       annotate("text", x=HDImidpoint, y=0.5*max(pThetaGivenData),
                 label=deparse(textToAdd4), parse=TRUE, size=8)+
 
         xlim(0,1)+
