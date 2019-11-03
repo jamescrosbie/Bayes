@@ -32,6 +32,7 @@ BernGrid = function( Theta, pTheta, Data,
     source(paste(funcPath, "/HDIofGrid.R", sep=""))
     source(paste(funcPath, "/openGraphSaveGraph.R", sep=""))
 
+
     # Check for input errors:
     if ( any( Theta > 1 | Theta < 0 ) ) {
         stop("Theta values must be between 0 and 1")
@@ -48,7 +49,7 @@ BernGrid = function( Theta, pTheta, Data,
 
 
     # Create summary values of Data
-    z <- sum( Data==1 )
+    z <- sum( Data == 1 )
     N <- length( Data )
 
     # Compute the likelihood
