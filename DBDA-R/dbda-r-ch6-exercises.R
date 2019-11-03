@@ -43,4 +43,16 @@ posterior = BernGrid( Theta=Theta, pTheta=pTheta , Data=data )
 
 #c
 data <- c(rep(0, 57), rep(1, 43))
+posterior <- posterior/sum(posterior)
 posterior = BernGrid( Theta=Theta, pTheta=posterior, Data=data )
+
+
+#6.6
+width <- 1/1000
+Theta = seq(from=width/2 , to=1-width/2 , by=width )
+relprob = Theta^2
+prior = relprob / sum(relprob)
+data <- c(rep(1,2),rep(0,2))
+posterior = BernGrid( Theta, prior, data )
+predprob = sum( thetagrid * posterior )
+predprob
