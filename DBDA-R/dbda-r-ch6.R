@@ -113,7 +113,7 @@ BernGrid = function( Theta, pTheta, Data,
     } else {
         textx = 0.8
     }
-    HDImidpoint = (Theta[ HDIinfo$indices[1] ] + Theta[tail(HDIinfo$indices, n=1)])/2
+    HDImidpoint <- (Theta[ HDIinfo$indices[1] ] + Theta[tail(HDIinfo$indices, n=1)])/2
 
 
     textToAdd <- bquote( "E(" * theta * "|D)=" * .(signif(meanThetaGivenData,3)) )
