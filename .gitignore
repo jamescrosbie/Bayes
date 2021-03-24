@@ -3,3 +3,8 @@ other/*
 .ipynb_checkpoints/*
 .ipynb_checkpoints/*
 .Rproj.user
+.RData/
+.Rhistory/
+.Rprofile/
+renv/
+.vscode/
